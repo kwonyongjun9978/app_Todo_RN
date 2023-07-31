@@ -6,22 +6,55 @@ import {
   TouchableOpacity, 
   TouchableHighlight,
   TouchableWithoutFeedback, 
-  Pressable
+  Pressable,
+  TextInput,
 } from 'react-native';
 import {theme} from "./colors";
+import { useState } from 'react';
 
 export default function App() {
+  const [working, setWorking] = useState(true);
+  const [text, setText] = useState("");
+  const [toDos, setToDos] = useState({});
+  const travel = () => setWorking(false);
+  const work = () => setWorking(true);
+  const onChangeText = (payload) => setText(payload);
+  const addToDo = () => {
+    if(text === ""){
+      return
+    }
+    // save to do
+    //3개의 object를 결합하기위해 Hash Table(Object.assign)사용
+    const newToDos = Object.assign(
+      {}, 
+      toDos, 
+      {[Date.now()]: {text, work: working}}
+    );
+    setToDos(newToDos);
+    setText("");
+  };
+  console.log(toDos);
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Text style={styles.btnText}>Work</Text>
+        <TouchableOpacity onPress={work}>
+          <Text style={{...styles.btnText, color: working ? "white" : theme.grey}}>Work</Text>
         </TouchableOpacity> 
-        <TouchableOpacity>
-          <Text style={styles.btnText}>Travel</Text>
+        <TouchableOpacity onPress={travel}>
+          <Text style={{...styles.btnText, color: !working ? "white" : theme.grey}}>Travel</Text>
         </TouchableOpacity>
       </View>
+        <TextInput 
+          returnKeyType='done'
+          onSubmitEditing={addToDo}
+          value={text}
+          autoCapitalize={'sentences'}
+          onChangeText={onChangeText}
+          placeholderTextColor='pink'
+          placeholder={working ? "Add a To Do" : "Where do you want to go?"} 
+          style={styles.input}
+        />
     </View>
   );
 }
@@ -43,6 +76,14 @@ const styles = StyleSheet.create({
     fontSize: 38,
     fontWeight: '600',
     color: 'white',
+  },
+  input:{
+    backgroundColor: 'white',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    marginTop: 20,
+    fontSize: 18,
   },
 
 });
